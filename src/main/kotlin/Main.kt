@@ -1,6 +1,6 @@
 import java.util.UUID
 
-open class Person(var name: String)
+open class Person(var name: String, var email: String, var pin: Int)
 
 class Account(var accountNumber: String, var accountType: String, var balance: Int) {
     fun deposit(amount: Int): Boolean {
@@ -24,13 +24,13 @@ class Account(var accountNumber: String, var accountType: String, var balance: I
     }
 }
 
-class User(name: String, var account: Account) : Person(name) {
+class User(name: String, email: String, pin: Int, var account: Account) : Person(name, email, pin) {
     fun displayDetails() {
         println("Name: $name, AccountNumber: ${account.accountNumber}, AccountType: ${account.accountType}, Balance: ${account.balance}")
     }
 }
 
-class BankManager(name: String, var accountNumber: String, var branch: String, var role: String) : Person(name) {
+class BankManager(name: String, email: String, pin: Int, private var accountNumber: String, private var branch: String, private var role: String) : Person(name, email, pin) {
     fun displayDetails() {
         println("Name: $name, AccountNumber: $accountNumber, Branch: $branch, Role: $role")
     }
@@ -38,11 +38,11 @@ class BankManager(name: String, var accountNumber: String, var branch: String, v
 
 fun main() {
     val users = mutableListOf(
-        User("Bond", Account(UUID.randomUUID().toString(), "Savings", 0)),
-        User("Alice", Account(UUID.randomUUID().toString(), "Checking", 0)),
-        User("Bond", Account(UUID.randomUUID().toString(), "Savings", 0))
+        User("Bond", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Savings", 0)),
+        User("Alice", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Checking", 0)),
+        User("Bond", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Savings", 0))
     )
-    val bankManager = BankManager("John", "123456", "MainBranch", "Manager")
+    val bankManager = BankManager("John", "abc@gmail.com", 1234, "123456", "MainBranch", "Manager")
 
     while (true) {
         println("Do you want to sign in as a customer or a banker?")
@@ -51,8 +51,12 @@ fun main() {
 
         when (readlnOrNull()?.toIntOrNull()) {
             1 -> {
-                bankManager.displayDetails()
-                manageBanker(users)
+                if (validatePin(bankManager)) {
+                    bankManager.displayDetails()
+                    manageBanker(users, bankManager)
+                } else {
+                    println("Invalid pin.")
+                }
             }
             2 -> {
                 println("Enter your name:")
@@ -61,7 +65,11 @@ fun main() {
 
                 if (matchingUsers.isNotEmpty()) {
                     val user = selectUser(matchingUsers)
-                    manageUser(users, user)
+                    if (validatePin(user)) {
+                        manageUser(users, user)
+                    } else {
+                        println("Invalid pin.")
+                    }
                 } else {
                     println("User not found.")
                 }
@@ -71,19 +79,27 @@ fun main() {
     }
 }
 
-fun manageBanker(users: MutableList<User>) {
+fun validatePin(person: Person): Boolean {
+    println("Enter pin:")
+    val enteredPin = readlnOrNull()?.toIntOrNull()
+    return enteredPin == person.pin
+}
+
+fun manageBanker(users: MutableList<User>, bankManager: BankManager) {
     while (true) {
         println("1. List Customer Details")
         println("2. Add User Details")
         println("3. Remove User Details")
-        println("4. Go Back")
+        println("4. Change Pin")
+        println("5. Go Back")
 
         when (readlnOrNull()?.toIntOrNull()) {
             1 -> listCustomerDetails(users)
             2 -> addUser(users)
             3 -> removeUser(users)
-            4 -> return
-            else -> println("Invalid selection. Please enter 1, 2, 3, or 4.")
+            4 -> changePin(bankManager)
+            5 -> return
+            else -> println("Invalid selection. Please enter 1, 2, 3, 4, or 5.")
         }
     }
 }
@@ -101,8 +117,8 @@ fun addUser(users: MutableList<User>) {
     println("Enter the initial balance:")
     val balance = readlnOrNull()?.toIntOrNull()
 
-    if (name != null && accountType != null && balance !=   null) {
-        users.add(User(name, Account(UUID.randomUUID().toString(), accountType, balance)))
+    if (name != null && accountType != null && balance != null) {
+        users.add(User(name, "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), accountType, balance)))
         println("User added successfully.")
     } else {
         println("Invalid input.")
@@ -146,16 +162,18 @@ fun manageUser(users: MutableList<User>, user: User) {
         user.displayDetails()
         println("Press 1 to edit user details")
         println("Press 2 to manage balance")
-        println("Press 3 to go back")
+        println("Press 3 to change pin")
+        println("Press 4 to go back")
 
         when (readlnOrNull()?.toIntOrNull()) {
             1 -> {
                 editUserDetails(users, user)
-                return // Exit after editing user details
+                return // Exit
             }
             2 -> manageBalance(user)
-            3 -> return
-            else -> println("Invalid selection. Please enter 1, 2, or 3.")
+            3 -> changePin(user)
+            4 -> return
+            else -> println("Invalid selection. Please enter 1, 2, 3, or 4.")
         }
     }
 }
@@ -170,10 +188,27 @@ fun editUserDetails(users: MutableList<User>, user: User) {
     val newBalance = readlnOrNull()?.toIntOrNull()
 
     if (newName != null && newAccountType != null && newBalance != null) {
-        users.add(User(newName, Account(UUID.randomUUID().toString(), newAccountType, newBalance)))
+        users.add(User(newName, user.email, user.pin, Account(UUID.randomUUID().toString(), newAccountType, newBalance)))
         println("User detail updated successfully.")
     } else {
         println("Invalid input.")
+    }
+}
+
+fun changePin(person: Person) {
+    println("Enter your email:")
+    val email = readlnOrNull()
+    if (email == person.email) {
+        println("Enter new pin:")
+        val newPin = readlnOrNull()?.toIntOrNull()
+        if (newPin != null) {
+            person.pin = newPin
+            println("Pin changed successfully.")
+        } else {
+            println("Invalid pin.")
+        }
+    } else {
+        println("Email does not match.")
     }
 }
 
