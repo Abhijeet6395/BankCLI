@@ -168,7 +168,7 @@ fun manageUser(users: MutableList<User>, user: User) {
         when (readlnOrNull()?.toIntOrNull()) {
             1 -> {
                 editUserDetails(users, user)
-                return // Exit
+                return
             }
             2 -> manageBalance(user)
             3 -> changePin(user)
