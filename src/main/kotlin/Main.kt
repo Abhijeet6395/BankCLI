@@ -4,13 +4,14 @@ open class Person(var name: String, var email: String, var pin: Int)
 
 class Account(var accountNumber: String, var accountType: String, var balance: Int) {
     fun deposit(amount: Int): Boolean {
-        if (balance + amount > 1_000_000) {
+        return if (balance + amount > 1_000_000) {
             println("Deposit failed. Balance cannot exceed 1,000,000 rupees.")
-            return false
+            false
+        } else {
+            balance += amount
+            println("Deposit successful. New Balance: $balance")
+            true
         }
-        balance += amount
-        println("Deposit successful. New Balance: $balance")
-        return true
     }
 
     fun withdraw(amount: Int): Boolean {
