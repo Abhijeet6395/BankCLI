@@ -39,7 +39,7 @@ class BankManager(name: String, email: String, pin: Int, private var accountNumb
 fun main() {
     val users = mutableListOf(
         User("Bond", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Savings", 0)),
-        User("Alice", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Checking", 0)),
+        User("Alice", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Savings", 0)),
         User("Bond", "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), "Savings", 0))
     )
     val bankManager = BankManager("John", "abc@gmail.com", 1234, "123456", "MainBranch", "Manager")
@@ -47,7 +47,7 @@ fun main() {
     while (true) {
         println("Do you want to sign in as a customer or a banker?")
         println("Enter 1 for Banker")
-        println("Enter 2 for User")
+        println("Enter 2 for Costumer")
 
         when (readlnOrNull()?.toIntOrNull()) {
             1 -> {
@@ -88,8 +88,8 @@ fun validatePin(person: Person): Boolean {
 fun manageBanker(users: MutableList<User>, bankManager: BankManager) {
     while (true) {
         println("1. List Customer Details")
-        println("2. Add User Details")
-        println("3. Remove User Details")
+        println("2. Add Costumer Details")
+        println("3. Remove Costumer Details")
         println("4. Change Pin")
         println("5. Go Back")
 
@@ -105,12 +105,12 @@ fun manageBanker(users: MutableList<User>, bankManager: BankManager) {
 }
 
 fun listCustomerDetails(users: List<User>) {
-    println("User Details:")
+    println("Costumer Details:")
     users.forEach { it.displayDetails() }
 }
 
 fun addUser(users: MutableList<User>) {
-    println("Enter the name of the new user:")
+    println("Enter the name of the new Costumer:")
     val name = readlnOrNull()
     println("Enter the account type:")
     val accountType = readlnOrNull()
