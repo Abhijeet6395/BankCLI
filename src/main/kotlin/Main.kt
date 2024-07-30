@@ -15,13 +15,14 @@ class Account(var accountNumber: String, var accountType: String, var balance: I
     }
 
     fun withdraw(amount: Int): Boolean {
-        if (amount > balance) {
+        return if (amount > balance) {
             println("Withdrawal failed. Insufficient balance.")
-            return false
+            false
+        } else {
+            balance -= amount
+            println("Withdrawal successful. New Balance: $balance")
+            true
         }
-        balance -= amount
-        println("Withdrawal successful. New Balance: $balance")
-        return true
     }
 }
 
