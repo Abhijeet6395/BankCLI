@@ -5,7 +5,7 @@ enum class AccountType {
     Savings
 }
 
-open class Person(var name: String, var email: String, var pin: Int) {//open is used to make classes inheritable classes by default are final
+open class Person(var name: String, var email: String, var pin: Int) {//open is used to make classes inheritable classes by default are final.
     fun changePin() {
         println("Enter your email:")
         val email = readlnOrNull()
