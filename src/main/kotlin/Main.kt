@@ -2,10 +2,27 @@ import java.util.UUID
 
 enum class AccountType {
     Current,
-    Savings;
+    Savings
 }
 
-open class Person(var name: String, var email: String, var pin: Int)
+open class Person(var name: String, var email: String, var pin: Int) {//open is used to make classes inheritable classes by default are final
+    fun changePin() {
+        println("Enter your email:")
+        val email = readlnOrNull()
+        if (email == this.email) {
+            println("Enter new pin:")
+            val newPin = readlnOrNull()?.toIntOrNull()
+            if (newPin != null) {
+                this.pin = newPin
+                println("Pin changed successfully.")
+            } else {
+                println("Invalid pin.")
+            }
+        } else {
+            println("Email does not match.")
+        }
+    }
+}
 
 class Account(var accountNumber: String, var accountType: AccountType, var balance: Int) {
     fun deposit(amount: Int): Boolean {
@@ -98,7 +115,7 @@ fun validatePin(person: Person): Boolean {
             println("Invalid pin.")
             if (attempts == 2) {
                 println("Forgot pin? Enter 'yes' to reset pin or 'no' to try again:")
-                if (readlnOrNull()?.lowercase() == "yes") {
+                if (readlnOrNull()?.uppercase() == "YES") {
                     resetPin(person)
                     return false
                 }
@@ -137,7 +154,7 @@ fun manageBanker(users: MutableList<User>, bankManager: BankManager) {
             1 -> listCustomerDetails(users)
             2 -> addUser(users)
             3 -> removeUser(users)
-            4 -> changePin(bankManager)
+            4 -> bankManager.changePin()
             5 -> return
             else -> println("Invalid selection. Please enter 1, 2, 3, 4, or 5.")
         }
@@ -156,16 +173,18 @@ fun addUser(users: MutableList<User>) {
     val accountTypeInput = readlnOrNull()
     println("Enter the initial balance:")
     val balance = readlnOrNull()?.toIntOrNull()
+    println("Set a default pin:")
+    val pin = readlnOrNull()?.toIntOrNull()
 
     val accountType = try {
-        AccountType.valueOf(accountTypeInput!!)
+        AccountType.valueOf(accountTypeInput!!.uppercase())
     } catch (e: IllegalArgumentException) {
         println("Invalid account type. Please enter SAVINGS or CURRENT.")
         return
     }
 
-    if (name != null && balance != null) {
-        users.add(User(name, "abc@gmail.com", 1234, Account(UUID.randomUUID().toString(), accountType, balance)))
+    if (name != null && balance != null && pin != null) {
+        users.add(User(name, "abc@gmail.com", pin, Account(UUID.randomUUID().toString(), accountType, balance)))
         println("User added successfully.")
     } else {
         println("Invalid input.")
@@ -218,7 +237,7 @@ fun manageUser(users: MutableList<User>, user: User) {
                 return
             }
             2 -> manageBalance(user)
-            3 -> changePin(user)
+            3 -> user.changePin()
             4 -> return
             else -> println("Invalid selection. Please enter 1, 2, 3, or 4.")
         }
@@ -246,23 +265,6 @@ fun editUserDetails(users: MutableList<User>, user: User) {
         println("User detail updated successfully.")
     } else {
         println("Invalid input.")
-    }
-}
-
-fun changePin(person: Person) {
-    println("Enter your email:")
-    val email = readlnOrNull()
-    if (email == person.email) {
-        println("Enter new pin:")
-        val newPin = readlnOrNull()?.toIntOrNull()
-        if (newPin != null) {
-            person.pin = newPin
-            println("Pin changed successfully.")
-        } else {
-            println("Invalid pin.")
-        }
-    } else {
-        println("Email does not match.")
     }
 }
 
